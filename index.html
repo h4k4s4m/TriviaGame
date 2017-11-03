@@ -23,10 +23,11 @@
                         <span id="time_left">0</span>
                     </h3>
                 </div>
-                <br><br>
+                <br>
+                <br>
                 <input type="submit" id="submit">
             </div>
-            </div>
+        </div>
     </header>
 
 
@@ -38,7 +39,11 @@
 
             //Timer variables
             var intervalID;
-            var time_left = 30;
+            var time_left = 15;
+
+            var right_answers = 0;
+            var wrong_answers = 0;
+            var unanswered = 4;
 
 
             $("#time_left").text(time_left);
@@ -80,12 +85,20 @@
                 makeQuestion(y);
 
             }
+
+
             function makeQuestion(qnumber) {
                 var questionDiv = $("<div>");
                 questionDiv.append("<br><br>");
                 questionDiv.append("<h3>" + questions[qnumber][0] + "</h3>");
                 for (var x = 0; x < 4; x++) {
-                    questionDiv.append("<input type='radio' name='group" + qnumber + "'>" + questions[qnumber][1][x] + "</input>");
+                    var newButton = $("<input>");
+                    newButton.attr('type', 'radio');
+                    newButton.attr('name', qnumber);
+                    newButton.data('answer', questions[qnumber][2]);
+                    newButton.data('value', questions[qnumber][1][x]);
+                    questionDiv.append(newButton)
+                    questionDiv.append(questions[qnumber][1][x]);
                 }
                 $('#timer').after(questionDiv);
             }
@@ -95,9 +108,23 @@
             $(document).on("click", '#submit', checkAnswers);
 
 
-            function checkAnswers(){
-            $( "input:checked" ).text("test");
-            
+            function checkAnswers() {
+
+                var checked = $("input:checked");
+                checked.each(function () {
+                    if ($(this).data('answer') == $(this).data('value')) {
+                        console.log($(this).data('answer'));
+                        console.log($(this).data('value'));
+                        unanswered--;
+                        right_answers++;
+                    }else{
+                        console.log($(this).data('answer'));
+                        console.log($(this).data('value'));
+                        unanswered--;
+                        wrong_answers++
+                    }
+                });
+                showScore();
             }
 
 
@@ -105,9 +132,22 @@
                 time_left--;
                 $("#time_left").text(time_left);
                 if (time_left == 0) {
-                    alert("BING!");
                     clearInterval(intervalID);
+                    checkAnswers();
                 }
+            }
+
+            function showScore(){
+                var main=$(".jumbotron");
+                main.empty();
+                main.append("<h1>SCORES</h1>");
+                main.append('<br>');
+                main.append("Correct: " + right_answers);
+                main.append('<br>');
+                main.append("Wrong: " + wrong_answers);
+                main.append('<br>');
+                main.append("Unanswered: " + unanswered);
+                
             }
         });
     </script>
